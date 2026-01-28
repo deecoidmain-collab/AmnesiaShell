@@ -3,7 +3,7 @@ Multiple shell launcher. Compatible with running commands through Windows and Li
 
 ## About
 AmnesiaShell is simple command line launcher. You can open WSL, Powershell, Bash in one window
-It automatically detects your system,
+It automatically detects your system
 
 ## Installation
 * **Windows**
