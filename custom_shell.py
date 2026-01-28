@@ -1,45 +1,28 @@
-import sys
-
-class CustomShell:
+class InternalCommands:
     """
-    Внутренняя реализация оболочки AmnesiaSh. 
-    Используется при ошибках системных оболочек или по выбору пользователя.
+    Обработчик встроенных команд AmnesiaSh.
     """
-    def __init__(self):
-        self.running = False
+    def __init__(self, logger):
+        self.log = logger
 
-    def run(self):
-        self.running = True
-        print("\n--- AmnesiaSh Internal Shell ---")
-        print("Type 'help' for available commands.")
-
-        while self.running:
-            try:
-                # Чтение ввода пользователя
-                user_input = input("AmnesiaSh> ").strip().lower()
-                
-                if not user_input:
-                    continue
-                
-                self._execute(user_input)
-            except EOFError:
-                break
-            except Exception as e:
-                print(f"Internal error: {e}")
-
-    def _execute(self, command):
-        """
-        Парсинг и выполнение встроенных команд.
-        """
-        if command == "exit":
-            self.running = False
-        elif command == "help":
-            print("\nAvailable internal commands:")
-            print("  help  - Show this message")
-            print("  beep  - Trigger a system notification (visual)")
-            print("  exit  - Return to the main menu")
-        elif command == "beep":
-            # Визуальный сигнал, так как звуковой может не работать в терминале
-            print("\n* BEEP! * (System Bell Triggered)")
+    def execute(self, cmd_name, args):
+        if cmd_name == "help":
+            self._show_help()
+        elif cmd_name == "beep":
+            print("\a") # Системный звук
+            self.log.info("Visual Beep: *BEEP*")
         else:
-            print(f"Unknown command: '{command}'. Type 'help' for info.")
+            self.log.error(f"Unknown command '{cmd_name}'", 
+                           reason="Use 'use <shell> <cmd>' or see 'help'")
+
+    def _show_help(self):
+        print("\n--- AmnesiaSh Help ---")
+        print("Usage:")
+        print("  use <shell> <command>  - Execute command in specific shell")
+        print("  Example: use bash ls -la")
+        print("  Example: use ps Get-Process")
+        print("\nSupported Shell IDs: bash, cmd, powershell (ps), wsl")
+        print("\nInternal Commands:")
+        print("  help - Show this help")
+        print("  beep - System bell")
+        print("  exit - Close application")

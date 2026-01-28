@@ -1,34 +1,40 @@
 import sys
-from ui import Menu
 from shell_manager import ShellManager
 from platform_utils import get_platform_info
+from logger import Logger
 
 def main():
     """
-    Основная функция AmnesiaSh. 
-    Инициализирует компоненты и управляет главным циклом программы.
+    Точка входа AmnesiaSh. 
+    Инициализирует систему и запускает интерактивный режим команд.
     """
     platform_info = get_platform_info()
-    manager = ShellManager(platform_info)
-    menu = Menu(platform_info)
+    log = Logger()
+    manager = ShellManager(platform_info, log)
 
-    print(f"--- Welcome to AmnesiaSh ---")
-    print(f"Running on: {platform_info['os_name']}")
+    log.info(f"AmnesiaSh v2.0 started on {platform_info['os_name']}")
+    log.info("Type 'help' for commands or 'use <shell> <cmd>' to execute.")
 
     while True:
-        # Отображение меню и получение выбора пользователя
-        choice = menu.show_and_get_choice()
-        
-        if choice == 'exit':
-            print("Exiting AmnesiaSh. Goodbye!")
-            sys.exit(0)
+        try:
+            # Чтение основной команды
+            user_input = input("\nAmnesiaSh> ").strip()
             
-        # Запуск выбранной оболочки через менеджер
-        manager.launch(choice)
+            if not user_input:
+                continue
+
+            if user_input.lower() in ['exit', 'quit']:
+                log.info("Exiting AmnesiaSh...")
+                break
+
+            # Обработка команды через менеджер
+            manager.process_input(user_input)
+
+        except KeyboardInterrupt:
+            print("\n")
+            log.info("Use 'exit' to quit safely.")
+        except Exception as e:
+            log.error(f"Unexpected system error: {e}")
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nInterrupted by user. Exiting...")
-        sys.exit(0)
+    main()
